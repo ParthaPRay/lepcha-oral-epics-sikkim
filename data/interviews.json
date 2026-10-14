@@ -264,5 +264,27 @@
     "videoLinkNote": "Direct YouTube watch link; playlist index preserved.",
     "contextNote": "This is the folklore behind the name of Rey Village in East Sikkim. Nimpincho Lepcha (Bongthing) recounts Mun Nyukung Purmit, a powerful female spiritual practitioner, decided to confront the devil. Devil Pond was once a place of fear and mystery. In ancient times, a devil was believed to abduct animals and young children from the nearby village ( Gangyap west Sikkim India), taking them to the pond and killing them. The villagers lived in fear of this evil presence. Mun Nyukung Purmit, a powerful female spiritual practitioner, decided to confront the devil. Using her spiritual power and sacred abilities, she destroyed the pond and defeated the evil force. Her courage and spiritual strength brought relief to the villagers. This legend remains an important part of local oral tradition and cultural heritage. The account documents this disappearing local folklore. The account documents this local folklore.",
     "status": "published"
+  },
+    {
+    "id": "lepcha-015",
+    "narrator": "Dukda Lepcha (Bongthing)",
+    "topic": "Rey Lapcho (Mundong)",
+    "narrativeType": "oral folklore",
+    "themes": ["folklore"],
+    "interviewBy": "Yongmit Lepcha",
+    "location": "Gangtok, Sikkim",
+    "mapLabel": "Gangtok — generalised point",
+    "latitude": 27.3389,
+    "longitude": 88.6065,
+    "coordinatePrecision": "approximate",
+    "locationNote": "This is a generalised Gangtok-area map point, not a precise interview site or the narrator's home. Confirm or replace it before publication if the project has a consented location.",
+    "mediaType": "Audio interview",
+    "videoUrl": "https://youtu.be/CRiEGtXoyag?si=ctm0yMNzaxw66z-t",
+    "videoLinkNote": "Direct YouTube watch link; playlist index preserved.",
+    "contextNote": "This is the folklore behind the name of Rey Village in East Sikkim. Dukda Lepcha (Bongthing) recounts that Rey was once full of Calamus plants, which gradually disappeared. In ancient times, villagers believed that evil spirits travelled along a foot trail connecting several settlements in East Sikkim, bringing illness and misfortune.
+In 1897, under the guidance of Lama Ugen Tenzin Rinpochee, the people of Rey, Mindu and Tingpyam built Rey Lapcho as a sacred protective barrier (Raksha Chakra).
+Destroyed by an earthquake in 1980, the sacred structure was reconstructed in 2020 under the guidance of Lama Karma Chultim Lepcha, affectionately known as Rey Lama.
+Today, Rey Lapcho stands as a spiritual guardian of the three villages, symbolizing Lepcha faith, unity, resilience and living cultural heritage.",
+    "status": "published"
   }
 ]

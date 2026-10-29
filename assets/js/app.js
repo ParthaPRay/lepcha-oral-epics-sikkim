@@ -308,21 +308,121 @@ function renderTeam(team) {
   }, {once: true}));
 }
 
+function asMediaEntries(value, defaultType) {
+  if (value === null || value === undefined || value === "") return [];
+  const values = Array.isArray(value) ? value : [value];
+  return values.map((entry) => {
+    if (typeof entry === "string") return {type: defaultType || guessActivityMediaType(entry), url: entry};
+    if (!entry || typeof entry !== "object") return null;
+    const url = entry.url || entry.src || entry.path || entry.href || "";
+    return {...entry, type: entry.type || entry.mediaType || defaultType || guessActivityMediaType(url)};
+  }).filter(Boolean);
+}
+
+function guessActivityMediaType(value) {
+  const text = String(value || "");
+  if (/\.(png|jpe?g|gif|webp|avif|svg)(?:[?#].*)?$/i.test(text)) return "image";
+  if (/\.(mp4|webm|ogg)(?:[?#].*)?$/i.test(text)) return "video";
+  if (/youtu\.be|youtube\.com|youtube-nocookie\.com/i.test(text)) return "video";
+  return "link";
+}
+
+function getActivityMedia(item) {
+  const entries = [
+    ...asMediaEntries(item.media),
+    ...asMediaEntries(item.images, "image"),
+    ...asMediaEntries(item.image, "image"),
+    ...asMediaEntries(item.imageUrl, "image"),
+    ...asMediaEntries(item.photoUrl, "image"),
+    ...asMediaEntries(item.videos, "video"),
+    ...asMediaEntries(item.video, "video"),
+    ...asMediaEntries(item.videoUrl, "video")
+  ];
+  const seen = new Set();
+
+  return entries.map((entry) => {
+    const type = String(entry.type || "link").toLowerCase();
+    const url = safeUrl(entry.url || entry.src || entry.path || entry.href);
+    const mediaType = ["photo", "photograph", "img"].includes(type)
+      ? "image"
+      : ["youtube", "movie", "clip"].includes(type)
+        ? "video"
+        : type;
+    return {
+      type: mediaType,
+      url,
+      alt: entry.alt || entry.imageAlt || item.title || "Project activity image",
+      caption: entry.caption || entry.imageCaption || "",
+      title: entry.title || entry.label || item.title || (mediaType === "video" ? "Project activity video" : "Project activity image")
+    };
+  }).filter((entry) => {
+    if (!entry.url) return false;
+    const key = `${entry.type}:${entry.url}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function youtubeEmbedUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    let videoId = "";
+
+    if (host === "youtu.be") videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+    if (["youtube.com", "m.youtube.com", "youtube-nocookie.com"].includes(host)) {
+      if (url.pathname === "/watch") videoId = url.searchParams.get("v") || "";
+      else videoId = url.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] || "";
+      if (!videoId && url.pathname === "/playlist" && url.searchParams.get("list")) {
+        return `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(url.searchParams.get("list"))}`;
+      }
+    }
+
+    return videoId ? `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}` : "";
+  } catch {
+    return "";
+  }
+}
+
+function renderActivityMedia(item) {
+  const media = getActivityMedia(item);
+  if (!media.length) return "";
+
+  return `<div class="activity-media">${media.map((entry) => {
+    if (entry.type === "image") {
+      return `<figure class="activity-image"><a href="${esc(entry.url)}" target="_blank" rel="noopener"><img src="${esc(entry.url)}" alt="${esc(entry.alt)}" loading="lazy"></a>${entry.caption ? `<figcaption>${esc(entry.caption)}</figcaption>` : ""}</figure>`;
+    }
+
+    if (entry.type === "video") {
+      const embed = youtubeEmbedUrl(entry.url);
+      if (embed) {
+        return `<figure class="activity-video"><div class="activity-video-frame"><iframe src="${esc(embed)}" title="${esc(entry.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>${entry.caption ? `<figcaption>${esc(entry.caption)}</figcaption>` : ""}</figure>`;
+      }
+      if (/\.(mp4|webm|ogg)(?:[?#].*)?$/i.test(entry.url)) {
+        return `<figure class="activity-video"><video controls preload="metadata" aria-label="${esc(entry.title)}"><source src="${esc(entry.url)}">Your browser does not support video playback.</video>${entry.caption ? `<figcaption>${esc(entry.caption)}</figcaption>` : ""}</figure>`;
+      }
+      return `<p class="activity-media-link"><a href="${esc(entry.url)}" target="_blank" rel="noopener">Watch video ↗</a>${entry.caption ? `<span>${esc(entry.caption)}</span>` : ""}</p>`;
+    }
+
+    return `<p class="activity-media-link"><a href="${esc(entry.url)}" target="_blank" rel="noopener">${esc(entry.title || "Open activity media ↗")}</a></p>`;
+  }).join("")}</div>`;
+}
+
 function renderActivities(items) {
   const host = $("#activity-list");
   if (!items.length) {
     host.innerHTML = '<div class="activity-empty">No publications, seminars or outreach activities have been entered yet. Add confirmed items in <code>data/activities.json</code>.</div>';
     return;
   }
+
   host.innerHTML = items.map((item) => {
-    const rawImage = typeof item.image === "string" ? item.image : item.image?.url;
-    const imageUrl = safeUrl(rawImage || item.imageUrl || item.photoUrl);
-    const imageAlt = item.imageAlt || item.image?.alt || item.title || "Project activity photograph";
-    const imageCaption = item.imageCaption || item.image?.caption || "";
     const location = item.location ? `<p class="activity-location"><strong>Location:</strong> ${esc(item.location)}</p>` : "";
-    const image = imageUrl ? `<figure class="activity-image"><a href="${esc(imageUrl)}" target="_blank" rel="noopener"><img src="${esc(imageUrl)}" alt="${esc(imageAlt)}" loading="lazy"></a>${imageCaption ? `<figcaption>${esc(imageCaption)}</figcaption>` : ""}</figure>` : "";
-    return `<article class="activity-card">${image}<span class="activity-type">${esc(item.type || "Project activity")}${item.date ? ` · ${esc(item.date)}` : ""}</span><h3>${esc(item.title || "Untitled activity")}</h3>${location}<p>${esc(item.description || "")}${item.contributors ? ` · ${esc(item.contributors)}` : ""}</p>${safeUrl(item.url) ? `<p><a href="${esc(safeUrl(item.url))}" target="_blank" rel="noopener">View details ↗</a></p>` : ""}</article>`;
+    const media = renderActivityMedia(item);
+    const detailsUrl = safeUrl(item.url);
+    return `<article class="activity-card">${media}<span class="activity-type">${esc(item.type || "Project activity")}${item.date ? ` · ${esc(item.date)}` : ""}</span><h3>${esc(item.title || "Untitled activity")}</h3>${location}<p>${esc(item.description || "")}${item.contributors ? ` · ${esc(item.contributors)}` : ""}</p>${detailsUrl ? `<p><a href="${esc(detailsUrl)}" target="_blank" rel="noopener">View details ↗</a></p>` : ""}</article>`;
   }).join("");
+
   host.querySelectorAll(".activity-image img").forEach((image) => image.addEventListener("error", () => image.closest(".activity-image").remove(), {once: true}));
 }
 

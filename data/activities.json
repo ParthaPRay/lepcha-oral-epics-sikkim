@@ -7,8 +7,13 @@
     "location": "Ridge Park, Gangtok, Sikkim",
     "description": "On 28 October 2026, the project team visited the Sikkim Art and Literature Festival 2026 at Ridge Park, Gangtok, Sikkim. The visit was an enriching and educational experience. During the festival, the team learned about the rich art, culture, traditions, and literature of Sikkim; explored various artistic works; and gained knowledge about the importance of preserving cultural heritage and indigenous languages. The festival also provided an opportunity to understand the creativity and literary contributions of different people. The visit was informative, enjoyable, and inspiring, helping the team appreciate the diversity and cultural richness of Sikkim.",
     "contributors": "Yongmit Lepcha, Phur Tshering Lepcha, and Pundimit Lepcha",
-    "image": "assets/images/SikkimArtandLiteratureFestival2026.jpg",
-    "imageAlt": "Yongmit Lepcha, Phur Tshering Lepcha, and Pundimit Lepcha at the Sikkim Art and Literature Festival 2026",
-    "imageCaption": "From left to right: Yongmit Lepcha, Phur Tshering Lepcha, and Pundimit Lepcha."
+    "media": [
+      {
+        "type": "image",
+        "url": "assets/images/SikkimArtandLiteratureFestival2026.jpg",
+        "alt": "Yongmit Lepcha, Phur Tshering Lepcha, and Pundimit Lepcha at the Sikkim Art and Literature Festival 2026",
+        "caption": "From left to right: Yongmit Lepcha, Phur Tshering Lepcha, and Pundimit Lepcha."
+      }
+    ]
   }
 ]
